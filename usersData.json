@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "name": "hassan ali",
+    "email": "hassanali0111272@gmail.com",
+    "password": "hassan0312@gmail",
+    "role": true
+  },
+  {
+    "id": 2,
+    "name": "Hassan Ali",
+    "email": "dev.hassanali63@gmail.com",
+    "password": "111111",
+    "role": false,
+    "jswt": "you.are.welcome"
+  }
+]
