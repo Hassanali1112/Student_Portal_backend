@@ -72,51 +72,53 @@ const createNewUser = async (req, res) => {
 // login function
 
 const getUser = async (req, res) => {
+  console.log("request arrived");
+
   let userIndex = null;
 
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
+  // if (!email || !password) {
+  //   return res.status(400).json({ message: "All fields are required" });
+  // }
 
-  try {
-    const users = await readData();
+  // try {
+  //   const users = await readData();
 
-    if (!users.length) {
-      return res.status(404).json({ message: "No users found" });
-    }
+  //   if (!users.length) {
+  //     return res.status(404).json({ message: "No users found" });
+  //   }
 
-    const user = users.find((userObj, index) => {
-      if (userObj.email === email) {
-        userIndex = index;
-        return true;
-      }
-      return false;
-    });
+  //   const user = users.find((userObj, index) => {
+  //     if (userObj.email === email) {
+  //       userIndex = index;
+  //       return true;
+  //     }
+  //     return false;
+  //   });
 
 
-    console.log(user)
+  //   console.log(user)
 
-    if (!user) {
-      return res.status(404).json({ message: "Email is incorrect!" });
-    }
+  //   if (!user) {
+  //     return res.status(404).json({ message: "Email is incorrect!" });
+  //   }
 
-    if (user.password !== password) {
-      return res.status(401).json({ message: "Password is incorrect!" });
-    }
+  //   if (user.password !== password) {
+  //     return res.status(401).json({ message: "Password is incorrect!" });
+  //   }
 
-    users[userIndex].jswt = "you.are.welcome";
-    await writeFile(users);
+  //   users[userIndex].jswt = "you.are.welcome";
+  //   await writeFile(users);
 
-    return res.status(200).json({
-      user,
-      session: users[userIndex].jswt,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
+  //   return res.status(200).json({
+  //     user,
+  //     session: users[userIndex].jswt,
+  //   });
+  // } catch (error) {
+  //   console.error(error);
+  //   return res.status(500).json({ message: "Internal server error" });
+  // }
 };
 
 
