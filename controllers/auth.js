@@ -3,27 +3,39 @@ const path = require("path");
 const bcrypt = require("bcrypt")
 const { json } = require("stream/consumers");
 const User  = require("../models/users.models.js");
+require("dotenv").config()
+const jwt = require("jsonwebtoken")
 
 
-const filePath = path.join(__dirname, "../usersData.json");
+// const filePath = path.join(__dirname, "../usersData.json");
 
-const readData = async () =>{
-  try {
-    const users = await fs.readFile(filePath, "utf-8");
-    return JSON.parse(users);
-  } catch (error) {
-    return error
-  }
+// const readData = async () =>{
+//   try {
+//     const users = await fs.readFile(filePath, "utf-8");
+//     return JSON.parse(users);
+//   } catch (error) {
+//     return error
+//   }
  
-}
+// }
 
-const writeFile = async (data) =>{
-  try {
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2))
-    return res.json(users)
-  } catch (error) {
-    return error
-  }
+// const writeFile = async (data) =>{
+//   try {
+//     await fs.writeFile(filePath, JSON.stringify(data, null, 2))
+//     return res.json(users)
+//   } catch (error) {
+//     return error
+//   }
+
+// }
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+
+const generateToken = async (userId) =>{
+  console.log(userId)
+  console.log(JWT_SECRET)
+ return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "2d" })
 
 }
 
@@ -100,6 +112,7 @@ const getUser = async (req, res) => {
     return res.status(400).json({ message: "All fields are required" });
   }
 
+
   const user = await User.findOne({email})
 
   if(!user){
@@ -111,6 +124,17 @@ const getUser = async (req, res) => {
   if(!checkPassword){
     res.status(401).json({message : "Incorrecr Password!"})
   }
+  const token = await generateToken(user._id)
+
+  res.cookie("token", token, {
+    secure : true,
+    maxAge : 2 * 24 * 60 * 60 * 1000,
+  })
+
+  res.status(201).json({
+    message : "Login successfully",
+    user : {username : user.name, email : user.email},
+     token : token})
 
   } catch (error) {
     
