@@ -16,7 +16,7 @@ app.use((req, res, next) => {
 });
 
 
-const PORT= process.env.PORT
+const PORT= process.env.PORT || 8080
 
 mongoose.connection.on("open", () => {
   console.log(`MongoDB Connected`);
