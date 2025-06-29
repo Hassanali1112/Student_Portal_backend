@@ -20,9 +20,10 @@ const couseSchema = new mongoose.Schema(
     },
     cnic: {
       type: String,
+      unique : true,
       require: true,
     },
-    course: {
+    courseSelect: {
       type: String,
       require: true,
     },
@@ -30,7 +31,7 @@ const couseSchema = new mongoose.Schema(
       type: String,
       require: true,
     },
-    timeSlout: {
+    timeSlot: {
       type: String,
       require: true,
     },
@@ -43,8 +44,14 @@ const couseSchema = new mongoose.Schema(
       require: true,
       default: false,
     },
+    status: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Course", couseSchema)
+const Course = mongoose.model("Course", couseSchema)
+
+module.exports = Course
