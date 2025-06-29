@@ -16,7 +16,7 @@ app.use((req, res, next) => {
 });
 
 
-const port= process.env.PORT
+const PORT= process.env.PORT
 
 mongoose.connection.on("open", () => {
   console.log(`MongoDB Connected`);
@@ -35,5 +35,7 @@ app.use('/api/applications', applicationsRouter)
 
 
 
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
 
-app.listen(port, ()=> console.log(`server in on http://localhost:${port}`))
