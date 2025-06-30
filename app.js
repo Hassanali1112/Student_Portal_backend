@@ -13,7 +13,11 @@ app.use((req, res) => {
   res.status(404).send("Route not found");
 });
 
-const PORT= process.env.PORT || 8080
+const PORT = process.env.PORT;
+if (!PORT) {
+  throw new Error("❌ PORT is not defined in environment.");
+}
+
 
 mongoose.connection.on("open", () => {
   console.log(`MongoDB Connected`);
@@ -30,7 +34,7 @@ app.use('/api/auth',authRoutes)
 app.use('/api/applications', applicationsRouter)
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ App is running and listening on actual port: ${PORT}`);
+  console.log(`✅ App is running on Railway-assigned port: ${PORT}`);
 });
 
 
