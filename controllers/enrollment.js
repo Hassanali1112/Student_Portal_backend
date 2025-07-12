@@ -1,5 +1,6 @@
 const cloudinary = require("cloudinary").v2
 require("dotenv").config();
+const { default: mongoose } = require("mongoose");
 const Course = require("../models/course.models");
 
 
@@ -104,6 +105,16 @@ const applyForCourse = async (req, res) => {
   
 };
 
+const getAllApplications = async (req, res) =>{
+  console.log("request received")
+  try {
+    const data = await Course.find()
+    res.send(data)
+  } catch (error) {
+    
+  }
+}
+
 // find application for download
 
 const downloadIdCard = async (req, res)=>{
@@ -124,7 +135,7 @@ const downloadIdCard = async (req, res)=>{
   
 }
 
-module.exports = {applyForCourse, downloadIdCard}
+module.exports = {applyForCourse, downloadIdCard, getAllApplications}
 
 // _______________________________________________________________________________________________________-
 

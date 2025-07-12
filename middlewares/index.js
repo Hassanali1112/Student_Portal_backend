@@ -8,22 +8,29 @@ require("dotenv").config();
 const JWT_SECRET = process.env.JWT_SECRET
 
 const verifyToken = async (req, res, next) => {
+  
+  // console.log("cookie",req.headers.cookie)  
+  // console.log("request", req.cookies.token);  
+  
 
   try {
 
-    const authorizedHeader = req.headers.authorization
+    const authorizedHeader = req.cookies.token
+    // const authorizedHeader1 = req.headers.authorization;
+  
+    
 
-    if(!authorizedHeader || !authorizedHeader.startsWith('Bearer ')){
-      return res.status(404).send({message: 'Unauthorized! Access Denied'})
-  }
+    if(!authorizedHeader){
+          return res.status(404).send({message: 'Unauthorized! Access Denied'})
+    }
+    
 
-  const token = authorizedHeader.split(" ")[1]
+  const tokenVerified = jwt.verify(authorizedHeader, JWT_SECRET)
 
-  const tokenVerified = jwt.verify(token, JWT_SECRET)
 
-  console.log(tokenVerified)
 
   const userFound = await User.findById(tokenVerified.userId).select("-password")
+  
 
   if(!userFound){
     res.status(301).json({message : "User not found"})
@@ -31,8 +38,13 @@ const verifyToken = async (req, res, next) => {
 
   req.user = userFound
 
-    
+  console.log(userFound)
+  res.send({data : "data"})
+
+    // next()
+
   } catch (error) {
+    console.log("catch")
     res.status(301).json({message : "Invalid token"})
   }
 

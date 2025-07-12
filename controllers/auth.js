@@ -59,7 +59,7 @@ const login = async (req, res) => {
 
   const user = await User.findOne({email})
 
-  console.log(user)
+ 
 
   if(!user){
    return res.status(401).json({message : "User with this email not exists!"})
@@ -72,18 +72,27 @@ const login = async (req, res) => {
   }
   console.log("done")
   const token = await generateToken(user._id)
-
+  console.log(token)
+  // res.cookie("token", token, {
+  //   secure : true,
+  //   maxAge : 2 * 24 * 60 * 60 * 1000,
+  // })
 
   res.cookie("token", token, {
-    secure : true,
-    maxAge : 2 * 24 * 60 * 60 * 1000,
-  })
+    httpOnly: true,
+    secure: false, // true in production with HTTPS
+    sameSite: "lax",
+    maxAge: 2 *24 * 60 * 60 * 1000,
+  });
+
   console.log("check after token");
 
   res.status(201).json({
-    message : "Login successfully",
-    user : {userId :user._id, username : user.name, email : user.email},
-     token : token})
+    success: true,
+    message: "Login successfully",
+        user: { userId: user._id, username: user.name, email: user.email },
+    token: token,
+  });
 
   } catch (error) {
     res.status(500).json({message : error})
@@ -94,13 +103,15 @@ const login = async (req, res) => {
 // user validation
 
 const getUser = async (req, res) => {
-  
   try {
-    const data = await User.find();
+    const data = req.user;
+  // console.log("req.user",data)
+  res.status(201).json({ success: true, data: "success" });
    
-    return res.send({ success: true, data : data });
-  } catch (error) {
+  //  res.status(201).json({ success: true, data : data });
     
+  } catch (error) {
+    console.log("catch errorrrr")
   }
 
 };
