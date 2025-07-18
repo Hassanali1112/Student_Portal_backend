@@ -113,59 +113,26 @@ const getUser = (req, res) => {
 
 const logout = async (req, res) => {
   
-  let userIndex = null
-
-  const { id } = req.body;
-
-  if (!id) {
-    res.status(404).json({ message: new Error() });
-  }
-
   try {
-    const users = await readData();
-
-    if (!users.length) {
-      return res.status(404).json({ message: "users not found" });
-    }
-
-    const user = users.find((userObj, index) => {
-      if (userObj.id === id) {
-        userIndex = index;
-        console.log(userIndex)
-        return true;
-      }
-      return false;
-    });
-
-    console.log(user);
-
-    // console.log(user)
     
-    if (Object.keys(user).length !== 0) {
-      if ("jswt" in user) {
-        console.log("")
-        delete users[userIndex].jswt
-        await writeFile(users)
-        res.status(200).json({ message : "log out succesfully" });
-      } else {
-        res.status(404).json({ message: null });
-      }
-    } else {
-      res.status(404).json({ message: null });
-    }
+      // res.clearCookie("token", {
+      //   httpOnly: true,
+      //   secure: process.env.NODE_ENV === "production", // Ensure secure in production
+      //   sameSite: "strict",
+      // });
+
+      // return res.status(200).json({ message: "Logout successful" });
+
+      res.clearCookie("token",{
+        httpOnly : true,
+        secure : false,
+        sameSite : "strict",
+      })
+    res.status(200).json({success : true, message : "logout successfully"})
   } catch (error) {
-    res.status(404).json({ message: "no data" });
+    res.status(500).json({success : false, message : "logout failure"})
   }
-  // if (!id) {
-  //   return null;
-  // } else {
-  //   const userFound = users.filter((user, index) => {
-  //     if (user.id === id) {
-  //       userIndex = index;
-  //     }
-  //   });
-  //   delete users[userIndex].jswt;
-  // }
+
 };
 
 module.exports = { createNewUser, login, getUser, logout };
