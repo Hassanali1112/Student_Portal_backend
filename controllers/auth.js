@@ -48,71 +48,66 @@ const createNewUser = async (req, res) => {
 // login function
 
 const login = async (req, res) => {
-
   try {
-    const { email, password } = req.body; 
+    const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
+    const user = await User.findOne({ email });
 
-  const user = await User.findOne({email})
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: "User with this email does not exist!" });
+    }
 
- 
+    const checkPassword = await bcrypt.compare(password, user.password);
 
-  if(!user){
-   return res.status(401).json({message : "User with this email not exists!"})
-  }
+    if (!checkPassword) {
+      return res.status(401).json({ message: "Incorrect Password!" });
+    }
 
-  const checkPassword = await bcrypt.compare(password, user.password)
+    const token = await generateToken(user._id);
 
-  if(!checkPassword){
-    res.status(401).json({message : "Incorrecr Password!"})
-  }
-  console.log("done")
-  const token = await generateToken(user._id)
-  console.log(token)
-  // res.cookie("token", token, {
-  //   secure : true,
-  //   maxAge : 2 * 24 * 60 * 60 * 1000,
-  // })
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, // Use true in production with HTTPS
+      sameSite: "Lax", // For cross-origin requests (Frontend 5173, Backend 5000)
+      maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+    });
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: false, // true in production with HTTPS
-    sameSite: "lax",
-    maxAge: 2 *24 * 60 * 60 * 1000,
-  });
-
-  console.log("check after token");
-
-  res.status(201).json({
-    success: true,
-    message: "Login successfully",
-        user: { userId: user._id, username: user.name, email: user.email },
-    token: token,
-  });
-
+   return res.status(200).json({
+      success: true,
+      message: "Login successfully",
+      user: { userId: user._id, username: user.name, email: user.email },
+      token
+    });
   } catch (error) {
-    res.status(500).json({message : error})
+    return res.status(500).json({ message: error.message || "Internal server error" });
   }
-
 };
+
+
 
 // user validation
 
-const getUser = async (req, res) => {
+const getUser = (req, res) => {
   try {
-    const data = req.user;
- 
-   res.status(201).json({ success: true, data : data });
-    
-  } catch (error) {
-    console.log("catch errorrrr")
-  }
+    if (!req.user) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized! No user found in request." });
+    }
 
+    res.status(200).json({ success: true, data: req.user });
+  } catch (error) {
+    console.error("Error in getUser:", error.message);
+    res.status(500).json({ message: "Something went wrong." });
+  }
 };
+
 
 // logout function
 

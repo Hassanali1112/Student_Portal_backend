@@ -38,6 +38,8 @@ const uploadImageToCloudinary = (buffer, fileName) =>{
 
 const applyForCourse = async (req, res) => {
 
+  console.log("request for course")
+
   try {
     const image = req.file;
 
@@ -68,12 +70,20 @@ const applyForCourse = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    const checkApplication = await Course.findOne({cnic: cnic})
+
+    if (checkApplication ) {
+      return res.status(409).json({ success : false, data : "application already exists!" });
+    }
+
     const uploadImage = await uploadImageToCloudinary(
       image.buffer,
       image.originalname
     );
 
-    console.log(uploadImage)
+    if(!uploadImage){
+      return res.status(400).json({success : false, message : "Image file is required!"} )
+    }
 
     const course = await new Course({
       userId,
@@ -88,14 +98,19 @@ const applyForCourse = async (req, res) => {
       agreement,
     });
 
-    console.log(course);
-
-    
     await course.save()
 
-    console.log("done");
+    const checkApplicationEntry = await Course.findById(course._id)
+   
+
+    if(!checkApplicationEntry){
+     return res.status(500).json({success : false, message : "Something went wrong while while creating new application!"})
+    }
+
   
-    res.status(201).json({success : true, message : "Application submit successfully" , data : course})
+    console.log("check",checkApplicationEntry);
+  
+   return res.status(201).json({success : true, message : "Application submit successfully" , data : checkApplicationEntry})
 
    
   } catch (error) {
@@ -126,6 +141,11 @@ const downloadIdCard = async (req, res)=>{
 
   try {
     const course = await Course.findOne({cnic})
+    // console.log(course)
+    if(!course){
+      console.log("null checked")
+     return res.status(404).json({succrss : false, data : "application not found"})
+    }
 
     return res.status(201).json(course);
   } catch (error) {
